@@ -1,0 +1,10 @@
+{
+  "extends": "@acl-services/typescript-conventions/tsconfig",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src"
+  ]
+}

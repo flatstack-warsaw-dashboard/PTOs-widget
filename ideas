@@ -1,0 +1,26 @@
+накидал тут на обеде:
+
+FS dashboard with widgets
+
+The main idea to display dashboard on TV in LIVE mode
++ post a screenshoot of dashboard to slack every morning (helpful for remote devs and who isn't in the office)
+
+For interface design inspiration: https://airtame.com/blog/top-kpi-dashboards/
+
+Widgets ideas:
+Current instagram images/stories + strava activities
+Days until friday
+Tweet of day (we can post a tweet to our dashboard via some slack bot or simply use some endpoint)
+Team members current location (display map with zooming)
+Days since last grcprd (data from JIRA)
+Birthdays today + upcoming (data from Notion)
+PTOs today + upcoming (data from Notion)
+On monitoring this week (who is on duty this week? data from Confluence)
+Company events today + upcoming (source? probably manually)
+Some stats from Yva
+
+Optional ideas:
+Btc currency
+Top conversation tags from slack
+Office wish list
+HN current top 3
