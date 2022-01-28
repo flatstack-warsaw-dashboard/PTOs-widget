@@ -28,7 +28,8 @@ export const lambdaHandler = async () => {
 
   const widgetData:
     Record<string, Record<string, { full_name: string | undefined, profile_photo: string | undefined }>> = {};
-  [todayPlus(1), todayPlus(2), todayPlus(3), todayPlus(4)].forEach((date: string) => {
+  [1, 2, 3, 4].forEach((daysFromToday: number) => {
+    const date = todayPlus(daysFromToday);
     widgetData[date] = {};
     ptos.forEach((pto: PTO) => {
       if (pto.startDate == date || pto.endDate == date || (pto.startDate < date && pto.endDate > date)) {
@@ -40,6 +41,8 @@ export const lambdaHandler = async () => {
       }
     });
   });
+  // clean dynamodb
+  // push new data to dynamodb
   console.log(widgetData)
 }
 
