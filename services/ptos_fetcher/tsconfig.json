@@ -1,6 +1,14 @@
 {
-  "extends": "@acl-services/typescript-conventions/tsconfig",
   "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "esModuleInterop": true,
+    "target": "es2019",
+    "sourceMap": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "removeComments": true,
+    "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src"
   },
