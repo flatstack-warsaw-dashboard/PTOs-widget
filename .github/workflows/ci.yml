@@ -1,0 +1,13 @@
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: yarn
+      working-directory: ./services/ptos_fetcher
+    - name: Run ESLint
+      run: yarn lint:all
+      working-directory: ./services/ptos_fetcher
