@@ -1,18 +1,18 @@
 import * as dotenv from 'dotenv';
+import AWS from 'aws-sdk';
+import * as dynamoDbHelper from './helpers/dynamodb';
+import { dynamoDbData } from './helpers/dynamodb';
 import PTOsFetcher from './fetchers/PTOsFetcher';
 import UsersFetcher from './fetchers/UsersFetcher';
 import PTO from './models/PTO';
 import User from './models/User';
-import AWS from 'aws-sdk';
-import { todayPlus } from "./helpers/time";
-import * as dynamoDbHelper from "./helpers/dynamodb";
-import { dynamoDbData } from "./helpers/dynamodb";
+import todayPlus from './helpers/time';
 
 dotenv.config();
 
 export const TOKEN = process.env.NOTION_TOKEN;
 
-AWS.config.update({ region: "eu-central-1" });
+AWS.config.update({ region: 'eu-central-1' });
 
 export const lambdaHandler = async () => {
   const today = todayPlus(1);
@@ -34,17 +34,17 @@ export const lambdaHandler = async () => {
     const dates = data[pto.uid]?.dates || [];
     dates.push({
       startDate: pto.startDate,
-      endDate: pto.endDate
-    })
+      endDate: pto.endDate,
+    });
     data[pto.uid] = {
       uid: user?.uid,
       full_name: user?.full_name,
       profile_photo: user?.profile_photo,
-      dates: dates
-    }
+      dates
+    };
   });
 
-  dynamoDbHelper.putRequest(data)
+  dynamoDbHelper.putRequest(data);
 };
 
 lambdaHandler();
