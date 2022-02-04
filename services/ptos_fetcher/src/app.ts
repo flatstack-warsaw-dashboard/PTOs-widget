@@ -1,19 +1,18 @@
 import * as dotenv from 'dotenv';
+import AWS from 'aws-sdk';
+import * as dynamoDbHelper from './helpers/dynamodb';
+import { dynamoDbData } from './helpers/dynamodb';
 import PTOsFetcher from './fetchers/PTOsFetcher';
 import UsersFetcher from './fetchers/UsersFetcher';
 import PTO from './models/PTO';
 import User from './models/User';
+import todayPlus from './helpers/time';
 
 dotenv.config();
 
 export const TOKEN = process.env.NOTION_TOKEN;
 
-export function todayPlus(plus: number): string {
-  const today = new Date();
-  return new Date(today.getFullYear(), today.getMonth(), today.getDate() + plus)
-    .toISOString()
-    .slice(0, 10);
-}
+AWS.config.update({ region: 'eu-central-1' });
 
 export const lambdaHandler = async () => {
   const today = todayPlus(1);
@@ -28,34 +27,24 @@ export const lambdaHandler = async () => {
   );
   const users = await usersFetcher.fetch();
 
-  const widgetData: Record<
-    string,
-    Record<
-      string,
-      { full_name: string | undefined; profile_photo: string | undefined }
-    >
-  > = {};
+  const data: dynamoDbData = {};
 
-  [1, 2, 3, 4].forEach((daysFromToday: number) => {
-    const date = todayPlus(daysFromToday);
-    widgetData[date] = {};
-    ptos.forEach((pto: PTO) => {
-      if (
-        pto.startDate === date ||
-        pto.endDate === date ||
-        (pto.startDate < date && pto.endDate > date)
-      ) {
-        const user = users.find((u: User) => u.uid === pto.uid);
-        widgetData[date][pto.uid] = {
-          full_name: user?.full_name,
-          profile_photo: user?.profile_photo,
-        };
-      }
+  ptos.forEach((pto: PTO) => {
+    const user = users.find((u: User) => u.uid === pto.uid);
+    const dates = data[pto.uid]?.dates || [];
+    dates.push({
+      startDate: pto.startDate,
+      endDate: pto.endDate,
     });
+    data[pto.uid] = {
+      uid: user?.uid,
+      full_name: user?.full_name,
+      profile_photo: user?.profile_photo,
+      dates
+    };
   });
-  // clean dynamodb
-  // push new data to dynamodb
-  console.log(widgetData);
+
+  dynamoDbHelper.putRequest(data);
 };
 
 lambdaHandler();
