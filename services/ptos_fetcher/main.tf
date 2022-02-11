@@ -109,3 +109,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.every_hour_on_weekdays.arn
 }
+
+output "database_arn" {
+  value = "${aws_dynamodb_table.ptos_fetcher.arn}"
+}

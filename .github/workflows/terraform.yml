@@ -19,6 +19,7 @@ on:
         type: choice
         options:
         - ptos_fetcher
+        - ptos_widget_api
 
 env:
   TF_CLI_ARGS_apply: "-auto-approve"
@@ -41,7 +42,7 @@ jobs:
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
       - name: Build
-        run: make
+        run: make build
       - name: Terraform init
         run: terraform init
       - name: Terraform plan
@@ -63,7 +64,7 @@ jobs:
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
       - name: Build
-        run: make
+        run: make build
       - name: Terraform init
         run: terraform init
       - name: Terraform apply
@@ -85,7 +86,7 @@ jobs:
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
       - name: Build
-        run: make
+        run: make build
       - name: Terraform init
         run: terraform init
       - name: Terraform destroy

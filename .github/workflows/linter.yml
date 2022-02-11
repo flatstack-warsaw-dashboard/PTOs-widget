@@ -1,0 +1,31 @@
+name: Linters
+
+on:
+  push:
+    branches-ignore:
+      - 'main'
+
+jobs:
+  lint_ptos_fetcher:
+    name: 'Lint PTOs fetcher'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/ptos_fetcher
+    steps:
+    - uses: actions/checkout@v2
+      run: yarn
+    - name: Run ESLint
+      run: yarn lint:all
+
+  lint_ptos_widget_api:
+    name: 'Lint PTOs widget API'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/ptos_widget_api
+    steps:
+    - uses: actions/checkout@v2
+      run: yarn
+    - name: Run ESLint
+      run: yarn lint:all
