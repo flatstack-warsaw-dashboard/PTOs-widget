@@ -22,6 +22,7 @@ on:
 
 env:
   TF_CLI_ARGS_apply: "-auto-approve"
+  TF_CLI_ARGS_destroy: "-auto-approve"
 
 jobs:
   plan:
