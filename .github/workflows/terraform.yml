@@ -20,6 +20,9 @@ on:
         options:
         - ptos_fetcher
 
+env:
+  TF_CLI_ARGS_apply: "-auto-approve"
+
 jobs:
   plan:
     if: github.event.inputs.command == 'plan'
