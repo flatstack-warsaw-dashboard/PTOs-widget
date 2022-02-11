@@ -28,7 +28,7 @@ export async function putRequest(data: dynamoDbData) {
   await documentClient
     .batchWrite({
       RequestItems: {
-        some: batchPutRequest,
+        [process.env.TABLE_NAME]: batchPutRequest,
       },
     })
     .promise();
