@@ -15,15 +15,19 @@ on:
       service:
         description: 'For service'
         required: true
-        default: 'all'
+        default: 'ptos_fetcher'
         type: choice
         options:
-        - all
         - ptos_fetcher
 
 jobs:
-  setup:
+  plan:
+    if: github.event.inputs.command == 'plan'
+    name: 'Plan'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: './services/${{ github.event.inputs.service }}'
     steps:
       - uses: actions/checkout@master
       - uses: aws-actions/configure-aws-credentials@v1
@@ -32,10 +36,51 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
-  terraform_plan:
-    if: github.event.inputs.command == 'plan'
-    name: 'Terraform Plan'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Terraform Init
+      - name: Build
+        run: make
+      - name: Terraform init
         run: terraform init
+      - name: Terraform plan
+        run: terraform plan
+
+  apply:
+    if: github.event.inputs.command == 'apply'
+    name: 'Apply'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: './services/${{ github.event.inputs.service }}'
+    steps:
+      - uses: actions/checkout@master
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+      - uses: hashicorp/setup-terraform@v1
+      - name: Build
+        run: make
+      - name: Terraform init
+        run: terraform init
+      - name: Terraform apply
+        run: terraform apply
+
+  destroy:
+    if: github.event.inputs.command == 'destroy'
+    name: 'Destroy'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: './services/${{ github.event.inputs.service }}'
+    steps:
+      - uses: actions/checkout@master
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+      - uses: hashicorp/setup-terraform@v1
+      - name: Terraform init
+        run: terraform init
+      - name: Terraform destroy
+        run: terraform destroy
