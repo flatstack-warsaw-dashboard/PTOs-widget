@@ -1,13 +1,15 @@
 name: CI
 on: push
 jobs:
-  check:
+  lint_ptos_fetcher:
+    name: 'Lint PTOs fetcher'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/ptos_fetcher
     steps:
     - uses: actions/checkout@v2
     - name: Install modules
       run: yarn
-      working-directory: ./services/ptos_fetcher
     - name: Run ESLint
       run: yarn lint:all
-      working-directory: ./services/ptos_fetcher
