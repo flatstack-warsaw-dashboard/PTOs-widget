@@ -16,7 +16,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+          aws-region: eu-central-1
       - name: Get API link
         working-directory: ./services/ptos_widget_api
         run: |
