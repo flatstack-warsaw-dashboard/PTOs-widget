@@ -23,7 +23,7 @@ export const lambdaHandler = async () => {
   > = {};
 
   items.Items.forEach((item) => {
-    [1, 2, 3, 4].forEach((daysFromToday: number) => {
+    [0, 1, 2, 3].forEach((daysFromToday: number) => {
       const date = todayPlus(daysFromToday);
       widgetData[date] ??= {};
 

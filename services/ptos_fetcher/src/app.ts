@@ -15,8 +15,8 @@ export const TOKEN = process.env.NOTION_TOKEN;
 AWS.config.update({ region: 'eu-central-1' });
 
 export const lambdaHandler = async () => {
-  const today = todayPlus(1);
-  const todayPlusThreeDays = todayPlus(4);
+  const today = todayPlus(0);
+  const todayPlusThreeDays = todayPlus(3);
 
   const ptosFetcher = new PTOsFetcher(today, todayPlusThreeDays, TOKEN);
   const ptos = await ptosFetcher.fetch();
