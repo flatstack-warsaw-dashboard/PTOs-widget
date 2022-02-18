@@ -152,6 +152,10 @@ data "archive_file" "authorizer_lambda_zip" {
   output_path = "./builds/lambda_authorizer"
 }
 
+data "aws_ssm_parameter" "allowed_ip" {
+  name = "ALLOWED_IP"
+}
+
 resource "aws_lambda_function" "authorizer_lambda" {
   filename         = data.archive_file.authorizer_lambda_zip.output_path
   function_name    = "ip_allowlist_authorizer"
@@ -159,6 +163,12 @@ resource "aws_lambda_function" "authorizer_lambda" {
   handler          = "lambda_authorizer.handler"
   runtime          = "nodejs14.x"
   source_code_hash = filebase64sha256(data.archive_file.authorizer_lambda_zip.output_path)
+
+  environment {
+    variables = {
+      ALLOWED_IP = data.aws_ssm_parameter.allowed_ip.value
+    }
+  }
 }
 
 resource "aws_apigatewayv2_authorizer" "ip_allowlist_authorizer" {
