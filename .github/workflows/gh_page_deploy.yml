@@ -1,9 +1,9 @@
 name: Build and Deploy as GitHub Page
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build-and-deploy:
