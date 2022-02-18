@@ -1,9 +1,9 @@
 name: Build and Deploy as GitHub Page
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -32,8 +32,7 @@ jobs:
           yarn build
 
       - name: Deploy
-        working-directory: ./services/ptos_widget
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: gh-pages
-          folder: build
+          folder: ./services/ptos_widget/build
