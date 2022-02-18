@@ -17,6 +17,7 @@ dist/
 # Build artifacts
 build/
 build
+builds/
 
 # Terraform artifacts
 .terraform/

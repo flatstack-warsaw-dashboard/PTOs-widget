@@ -20,7 +20,7 @@ provider "aws" {
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "./dist"
-  output_path = "./build"
+  output_path = "./builds/lambda"
 }
 
 resource "aws_iam_role" "lambda" {
@@ -124,10 +124,11 @@ resource "aws_apigatewayv2_integration" "integration" {
 }
 
 resource "aws_apigatewayv2_route" "get_index" {
-  api_id = aws_apigatewayv2_api.lambda.id
-
-  route_key = "GET /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.integration.id}"
+  api_id             = aws_apigatewayv2_api.lambda.id
+  authorizer_id      = aws_apigatewayv2_authorizer.ip_allowlist_authorizer.id
+  authorization_type = "CUSTOM"
+  route_key          = "GET /{proxy+}"
+  target             = "integrations/${aws_apigatewayv2_integration.integration.id}"
 }
 
 resource "aws_cloudwatch_log_group" "api_gw" {
@@ -143,6 +144,38 @@ resource "aws_lambda_permission" "api_gw" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
+}
+
+data "archive_file" "authorizer_lambda_zip" {
+  type        = "zip"
+  source_file = "./scripts/lambda_authorizer.js"
+  output_path = "./builds/lambda_authorizer"
+}
+
+resource "aws_lambda_function" "authorizer_lambda" {
+  filename         = data.archive_file.authorizer_lambda_zip.output_path
+  function_name    = "ip_allowlist_authorizer"
+  role             = aws_iam_role.lambda.arn
+  handler          = "lambda_authorizer.handler"
+  runtime          = "nodejs14.x"
+  source_code_hash = filebase64sha256(data.archive_file.authorizer_lambda_zip.output_path)
+}
+
+resource "aws_apigatewayv2_authorizer" "ip_allowlist_authorizer" {
+  api_id                            = aws_apigatewayv2_api.lambda.id
+  authorizer_type                   = "REQUEST"
+  enable_simple_responses           = "true"
+  authorizer_uri                    = aws_lambda_function.authorizer_lambda.invoke_arn
+  authorizer_payload_format_version = "2.0"
+  identity_sources                  = ["$context.identity.sourceIp"]
+  name                              = "ip_allowlist_authorizer"
+}
+
+resource "aws_lambda_permission" "authorizer_lambda_invoke" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.authorizer_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.lambda.execution_arn}/authorizers/${aws_apigatewayv2_authorizer.ip_allowlist_authorizer.id}"
 }
 
 output "base_url" {
