@@ -89,10 +89,11 @@ resource "aws_apigatewayv2_api" "lambda" {
   name          = var.global_name
   protocol_type = "HTTP"
 }
+
 resource "aws_apigatewayv2_stage" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
 
-  name        = "ptos"
+  name        = "$default"
   auto_deploy = true
 
   access_log_settings {
@@ -125,7 +126,7 @@ resource "aws_apigatewayv2_integration" "integration" {
 resource "aws_apigatewayv2_route" "get_index" {
   api_id = aws_apigatewayv2_api.lambda.id
 
-  route_key = "GET /index"
+  route_key = "GET /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.integration.id}"
 }
 

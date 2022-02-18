@@ -1,0 +1,12 @@
+{
+  "parser": "typescript",
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": "*.css",
+      "options": {
+        "parser": "css"
+      }
+    }
+  ]
+}

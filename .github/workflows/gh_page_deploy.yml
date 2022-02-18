@@ -1,0 +1,39 @@
+name: Build and Deploy as GitHub Page
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get API link
+        working-directory: ./services/ptos_widget_api
+        run: |
+          terraform init
+          echo 'API_ENDPOINT='$(terraform output -raw base_url) >> $GITHUB_ENV
+
+      - name: Install and Build
+        working-directory: ./services/ptos_widget
+        env:
+          REACT_APP_API_ENDPOINT: ${{ env.API_ENDPOINT || secrets.MOCK_API_ENDPOINT }}
+        run: |
+          yarn
+          yarn build
+
+      - name: Deploy
+        working-directory: ./services/ptos_widget
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          branch: gh-pages
+          folder: build

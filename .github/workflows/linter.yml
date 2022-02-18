@@ -14,6 +14,7 @@ jobs:
         working-directory: ./services/ptos_fetcher
     steps:
     - uses: actions/checkout@v2
+    - name: Install modules
       run: yarn
     - name: Run ESLint
       run: yarn lint:all
@@ -26,6 +27,20 @@ jobs:
         working-directory: ./services/ptos_widget_api
     steps:
     - uses: actions/checkout@v2
+    - name: Install modules
+      run: yarn
+    - name: Run ESLint
+      run: yarn lint:all
+
+  lint_ptos_widget:
+    name: 'Lint PTOs widget'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/ptos_widget
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
       run: yarn
     - name: Run ESLint
       run: yarn lint:all
