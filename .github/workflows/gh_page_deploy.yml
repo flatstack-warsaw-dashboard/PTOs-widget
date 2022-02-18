@@ -24,8 +24,6 @@ jobs:
         run: |
           terraform init
           echo 'API_ENDPOINT='$(terraform output -raw base_url) >> $GITHUB_ENV
-          output=$(terraform output -raw base_url)
-          echo $output
 
       - name: Install and Build
         working-directory: ./services/ptos_widget
