@@ -42,7 +42,7 @@ jobs:
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
       - name: Build
-        run: make build
+        run: make package
       - name: Terraform init
         run: terraform init
       - name: Terraform plan
@@ -64,7 +64,7 @@ jobs:
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
       - name: Build
-        run: make build
+        run: make package
       - name: Terraform init
         run: terraform init
       - name: Terraform apply
@@ -86,7 +86,7 @@ jobs:
           aws-region: eu-central-1
       - uses: hashicorp/setup-terraform@v1
       - name: Build
-        run: make build
+        run: make package
       - name: Terraform init
         run: terraform init
       - name: Terraform destroy
