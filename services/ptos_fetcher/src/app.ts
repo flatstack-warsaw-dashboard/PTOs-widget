@@ -44,7 +44,9 @@ export const lambdaHandler = async () => {
     };
   });
 
-  dynamoDbHelper.putRequest(data);
+  if (Object.entries(data).length !== 0) {
+    dynamoDbHelper.putRequest(data);
+  }
 };
 
 lambdaHandler();
