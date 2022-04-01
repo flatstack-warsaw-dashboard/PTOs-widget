@@ -20,6 +20,7 @@ on:
         options:
         - ptos_fetcher
         - ptos_widget_api
+        - ptos_widget
 
 env:
   TF_CLI_ARGS_apply: "-auto-approve"

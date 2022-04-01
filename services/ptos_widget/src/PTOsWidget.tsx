@@ -1,5 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import './PTOsWidget.css';
+import styled from 'styled-components';
+
+const Widget = styled.div`
+  min-width: 320px;
+  max-width: 20%;
+  margin: 1em auto;
+  padding: 1em;
+  font-family: arial, helvetica, san-serif;
+  background: #eee;
+  border-radius: 0.2em;
+  box-shadow: 0 0 0.1em rgba(0, 0, 0, 0.5);
+
+  &:last-child {
+    border-top: 6px solid red;
+  }
+`;
+
+const Header = styled.h1`
+  margin: 0 0 0.4em;
+  font-weight: bold;
+`;
+
+const DateBlock = styled.div`
+  display: block;
+  padding: 0.1em;
+  color: #333;
+  transition: all 0.25s ease;
+
+  .date__icon {
+    float: left;
+    width: 3em;
+    margin-right: 0.75em;
+  }
+
+  .date__month {
+    margin-bottom: 0.15em;
+    padding: 0.1em;
+    color: white;
+    font-size: 0.75em;
+    text-align: center;
+    background: gray;
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+  }
+
+  .date__month_today {
+    background: #c00000;
+  }
+
+  .date__day {
+    color: black;
+    font-weight: bold;
+    font-size: 1.25em;
+    text-align: center;
+    background: white;
+    border: 1px solid #999;
+    border-bottom-right-radius: 0.1em;
+    border-bottom-left-radius: 0.1em;
+  }
+
+  .date__title {
+    display: table-cell;
+    height: 3em;
+    font-size: 1.1em;
+  }
+
+  .date__empty-day {
+    font-size: 0.8em;
+  }
+
+  .date__people-imgs {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .date__people-imgs img {
+    width: 2em;
+    height: 2em;
+    margin-right: -10px;
+    object-fit: cover;
+    border: 0.1em solid white;
+    border-radius: 50%;
+  }
+`;
 
 function PTOsWidget() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -14,7 +98,7 @@ function PTOsWidget() {
   function apiEndpointInvalid() {
     if (process.env.REACT_APP_API_ENDPOINT === undefined) {
       setIsLoading(false);
-      setLoadingError("Api endpoint isn't defined");
+      setLoadingError("API endpoint isn't defined");
       return true;
     }
     return false;
@@ -67,15 +151,15 @@ function PTOsWidget() {
   }, []);
 
   return (
-    <div className="ptos-widget">
-      <h1>Personal days-off</h1>
+    <Widget>
+      <Header>Personal days-off</Header>
 
       {loadingError && <p>Error occured: {loadingError}</p>}
 
       {isLoading && <p>Loading ...</p>}
 
       {Object.keys(ptos).map((date) => (
-        <div key={date} className="date">
+        <DateBlock key={date}>
           <div className="date__icon">
             <div
               className={`date__month ${isToday(date) && 'date__month_today'}`}
@@ -98,9 +182,9 @@ function PTOsWidget() {
               ))}
             </div>
           </div>
-        </div>
+        </DateBlock>
       ))}
-    </div>
+    </Widget>
   );
 }
 
