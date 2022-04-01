@@ -1,6 +1,7 @@
 import * as ReactDOM from 'react-dom';
-import PTOsWidgetComponent from './PTOsWidget';
+import React from 'react';
 import { StyleSheetManager } from 'styled-components';
+import PTOsWidgetComponent from './PTOsWidget';
 
 class PTOsWidget extends HTMLElement {
   private shadow = this.attachShadow({ mode: 'open' });
@@ -12,9 +13,7 @@ class PTOsWidget extends HTMLElement {
   render() {
     ReactDOM.render(
       <StyleSheetManager target={this.shadow as unknown as HTMLElement}>
-        <>
-          <PTOsWidgetComponent />
-        </>
+        <PTOsWidgetComponent />
       </StyleSheetManager>,
       this.shadow,
     );
