@@ -32,9 +32,6 @@ export default {
     new webpack.DefinePlugin({
       "process.env": JSON.stringify(process.env)
     }),
-    // new webpack.optimize.LimitChunkCountPlugin({
-    //     maxChunks: 1
-    // }),
     new webpack.container.ModuleFederationPlugin({
       name,
       filename: 'remote.js',

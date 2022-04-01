@@ -22,11 +22,11 @@ export const lambdaHandler = async () => {
     >
   > = {};
 
-  items.Items.forEach((item) => {
-    [0, 1, 2, 3].forEach((daysFromToday: number) => {
-      const date = todayPlus(daysFromToday);
-      widgetData[date] ??= {};
+  [0, 1, 2, 3].forEach((daysFromToday: number) => {
+    const date = todayPlus(daysFromToday);
+    widgetData[date] ??= {};
 
+    items.Items.forEach((item) => {
       item.dates.forEach((ptoDates) => {
         if (
           ptoDates.startDate === date ||
