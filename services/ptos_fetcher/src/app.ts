@@ -31,7 +31,7 @@ export const lambdaHandler = async () => {
 
   ptos.forEach((pto: PTO) => {
     const user = users.find((u: User) => u.uid === pto.uid);
-    const dates = data[pto.uid]?.dates || [];
+    const { dates = [] } = data[pto.uid] || {};
     dates.push({
       startDate: pto.startDate,
       endDate: pto.endDate,

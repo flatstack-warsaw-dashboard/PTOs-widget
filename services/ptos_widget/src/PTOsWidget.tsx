@@ -121,7 +121,7 @@ function PTOsWidget() {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      setLoadingError(errorMessage);
+      setLoadingError(`${errorMessage}. Did you turn on VPN?`);
     } finally {
       setIsLoading(false);
     }

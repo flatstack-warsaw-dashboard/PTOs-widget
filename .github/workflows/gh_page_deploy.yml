@@ -28,7 +28,7 @@ jobs:
       - name: Install and Build
         working-directory: ./services/ptos_widget
         env:
-          REACT_APP_API_ENDPOINT: ${{ secrets.MOCK_API_ENDPOINT || env.API_ENDPOINT }}
+          REACT_APP_API_ENDPOINT: ${{ env.API_ENDPOINT || secrets.MOCK_API_ENDPOINT }}
         run: |
           yarn
           yarn build
