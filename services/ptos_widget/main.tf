@@ -35,5 +35,5 @@ resource "aws_s3_object" "js_objects" {
   acl           = "public-read"
   etag          = filemd5("dist/${each.value}")
   content_type  = "application/javascript"
-  cache_control = "max-age=31536000"
+  cache_control = "max-age=86400"
 }
