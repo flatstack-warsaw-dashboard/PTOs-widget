@@ -184,6 +184,7 @@ resource "aws_apigatewayv2_authorizer" "ip_allowlist_authorizer" {
   authorizer_payload_format_version = "2.0"
   identity_sources                  = ["$context.identity.sourceIp"]
   name                              = "ip_allowlist_authorizer"
+  authorizer_result_ttl_in_seconds  = 0
 }
 
 resource "aws_lambda_permission" "authorizer_lambda_invoke" {
