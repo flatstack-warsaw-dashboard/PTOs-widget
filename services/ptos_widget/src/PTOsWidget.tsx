@@ -3,8 +3,6 @@ import styled from 'styled-components';
 
 const Widget = styled.div`
   min-width: 320px;
-  max-width: 20%;
-  margin: 1em auto;
   padding: 1em;
   font-family: arial, helvetica, san-serif;
   background: #eee;
@@ -14,11 +12,6 @@ const Widget = styled.div`
   &:last-child {
     border-top: 6px solid red;
   }
-`;
-
-const Header = styled.h1`
-  margin: 0 0 0.4em;
-  font-weight: bold;
 `;
 
 const DateBlock = styled.div`
@@ -152,8 +145,6 @@ function PTOsWidget() {
 
   return (
     <Widget>
-      <Header>Personal days-off</Header>
-
       {loadingError && <p>Error occured: {loadingError}</p>}
 
       {isLoading && <p>Loading ...</p>}
