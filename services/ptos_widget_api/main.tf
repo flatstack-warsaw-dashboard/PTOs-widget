@@ -151,47 +151,15 @@ resource "aws_lambda_permission" "api_gw" {
   source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
 }
 
-data "archive_file" "authorizer_lambda_zip" {
-  type        = "zip"
-  source_file = "./scripts/lambda_authorizer.js"
-  output_path = "./builds/lambda_authorizer"
-}
-
-data "aws_ssm_parameter" "allowed_ip" {
-  name = "ALLOWED_IP"
-}
-
-resource "aws_lambda_function" "authorizer_lambda" {
-  filename         = data.archive_file.authorizer_lambda_zip.output_path
-  function_name    = "ip_allowlist_authorizer"
-  role             = aws_iam_role.lambda.arn
-  handler          = "lambda_authorizer.handler"
-  runtime          = "nodejs14.x"
-  source_code_hash = filebase64sha256(data.archive_file.authorizer_lambda_zip.output_path)
-
-  environment {
-    variables = {
-      ALLOWED_IP = data.aws_ssm_parameter.allowed_ip.value
-    }
-  }
-}
-
 resource "aws_apigatewayv2_authorizer" "ip_allowlist_authorizer" {
   api_id                            = aws_apigatewayv2_api.lambda.id
   authorizer_type                   = "REQUEST"
   enable_simple_responses           = "true"
-  authorizer_uri                    = aws_lambda_function.authorizer_lambda.invoke_arn
+  authorizer_uri                    = "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:157940840475:function:authorizer/invocations"
   authorizer_payload_format_version = "2.0"
   identity_sources                  = ["$context.identity.sourceIp"]
   name                              = "ip_allowlist_authorizer"
   authorizer_result_ttl_in_seconds  = 0
-}
-
-resource "aws_lambda_permission" "authorizer_lambda_invoke" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.authorizer_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.lambda.execution_arn}/authorizers/${aws_apigatewayv2_authorizer.ip_allowlist_authorizer.id}"
 }
 
 output "base_url" {
