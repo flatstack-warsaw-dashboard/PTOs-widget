@@ -14,7 +14,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-central-1"
+  region = "eu-central-1"
 }
 
 variable "global_name" { default = "ptos_fetcher" }
@@ -115,6 +115,76 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
   source_arn    = aws_cloudwatch_event_rule.every_hour_on_weekdays.arn
 }
 
+module "chatbot_slack_configuration" {
+  source  = "waveaccounting/chatbot-slack-configuration/aws"
+  version = "1.1.0"
+
+  configuration_name = "aws-alerts-chatbot"
+  iam_role_arn       = aws_iam_role.chatbot.arn
+  slack_channel_id   = "C04AD8NPSB0"
+  slack_workspace_id = "T336TTHNW"
+
+  sns_topic_arns = [
+    aws_sns_topic.alarm.arn,
+  ]
+}
+
+resource "aws_iam_role" "chatbot" {
+  name = "AwsChatBot"
+
+  assume_role_policy = <<-POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "chatbot.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  }
+  POLICY
+}
+
+data "aws_iam_policy_document" "chatbot_policy" {
+  statement {
+    sid    = "AllowCloudWatch"
+    effect = "Allow"
+
+    actions = [
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*"
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_sns_topic" "alarm" {
+  name = "lambda-error-alarm"
+}
+
+resource "aws_cloudwatch_metric_alarm" "fetcher_lambda_errors" {
+  alarm_name          = "fetcher_lambda_errors_alarm"
+  alarm_description   = "Lambda function failed more than 1 time in the last 30 minutes."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  period              = 1800
+  datapoints_to_alarm = 1
+  statistic           = "Sum"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  dimensions = {
+    "FunctionName" = aws_lambda_function.lambda.function_name
+  }
+  threshold          = 1
+  treat_missing_data = "missing"
+  alarm_actions      = [aws_sns_topic.alarm.arn]
+}
+
 output "database_arn" {
-  value = "${aws_dynamodb_table.ptos_fetcher.arn}"
+  value = aws_dynamodb_table.ptos_fetcher.arn
 }
