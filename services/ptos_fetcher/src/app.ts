@@ -27,7 +27,10 @@ export const lambdaHandler = async () => {
   );
   const users = await usersFetcher.fetch();
 
-  const data: dynamoDbData = {};
+  const lastUpdatedAt = Date.now().toString();
+  const data: dynamoDbData = {
+    'meta': { uid: 'meta', last_updated_at: lastUpdatedAt }
+  };
 
   ptos.forEach((pto: PTO) => {
     const user = users.find((u: User) => u.uid === pto.uid);
@@ -40,13 +43,12 @@ export const lambdaHandler = async () => {
       uid: user?.uid,
       full_name: user?.full_name,
       profile_photo: user?.profile_photo,
+      last_updated_at: lastUpdatedAt,
       dates
     };
   });
 
-  if (Object.entries(data).length !== 0) {
-    dynamoDbHelper.putRequest(data);
-  }
+  dynamoDbHelper.putRequest(data);
 };
 
 lambdaHandler();

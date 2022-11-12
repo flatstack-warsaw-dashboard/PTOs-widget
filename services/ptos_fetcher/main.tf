@@ -78,6 +78,42 @@ resource "aws_dynamodb_table" "ptos_fetcher" {
   }
 }
 
+resource "aws_dynamodb_table_item" "ptos_fetcher_metadata_item" {
+  table_name = aws_dynamodb_table.ptos_fetcher.name
+  hash_key   = aws_dynamodb_table.ptos_fetcher.hash_key
+
+  item = <<-ITEM
+  {
+    "uid": {
+      "S": "meta"
+    },
+    "dates": {
+      "L": [
+        {
+          "M": {
+            "endDate": {
+              "S": "0000-00-00"
+            },
+            "startDate": {
+              "S": "0000-00-00"
+            }
+          }
+        }
+      ]
+    },
+    "full_name": {
+      "S": "0"
+    },
+    "profile_photo": {
+      "S": "0"
+    },
+    "last_updated_at": {
+      "S": "0"
+    }
+  }
+  ITEM
+}
+
 data "aws_iam_policy_document" "dynamo" {
   statement {
     actions = [

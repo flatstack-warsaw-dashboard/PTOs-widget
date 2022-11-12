@@ -4,12 +4,13 @@ export type dynamoDbData = Record<
   string,
   {
     uid?: string | undefined;
-    full_name: string | undefined;
-    profile_photo: string | undefined;
-    dates: Array<{
+    full_name?: string | undefined;
+    profile_photo?: string | undefined;
+    dates?: Array<{
       startDate: string | undefined;
       endDate: string | undefined;
     }>;
+    last_updated_at?: string;
   }
 >;
 

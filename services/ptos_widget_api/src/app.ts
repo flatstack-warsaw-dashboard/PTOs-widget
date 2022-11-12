@@ -22,23 +22,26 @@ export const lambdaHandler = async () => {
     >
   > = {};
 
+  const metaItem = items.Items.find(item => item.uid === 'meta');
+
   [0, 1, 2, 3].forEach((daysFromToday: number) => {
     const date = todayPlus(daysFromToday);
     widgetData[date] ??= {};
 
     items.Items.forEach((item) => {
-      item.dates.forEach((ptoDates) => {
-        if (
-          ptoDates.startDate === date ||
-          ptoDates.endDate === date ||
-          (ptoDates.startDate < date && ptoDates.endDate > date)
-        ) {
-          widgetData[date][item.uid] = {
-            full_name: item.full_name,
-            profile_photo: item.profile_photo,
-          };
-        }
-      });
+      if (item.last_updated_at >= metaItem.last_updated_at) {
+        item.dates?.forEach((ptoDates) => {
+          if (
+            ptoDates.startDate === date || ptoDates.endDate === date ||
+            (ptoDates.startDate < date && ptoDates.endDate > date)
+          ) {
+            widgetData[date][item.uid] = {
+              full_name: item.full_name,
+              profile_photo: item.profile_photo,
+            };
+          }
+        });
+      }
     });
   });
 
