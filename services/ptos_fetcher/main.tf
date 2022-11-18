@@ -67,7 +67,7 @@ resource "aws_lambda_function" "lambda" {
 
   depends_on = [
     aws_iam_role_policy_attachment.lambda_logs,
-    aws_cloudwatch_log_group.example,
+    aws_cloudwatch_log_group.lambda,
   ]
 }
 
@@ -120,7 +120,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
   source_arn    = aws_cloudwatch_event_rule.every_hour_on_weekdays.arn
 }
 
-resource "aws_cloudwatch_log_group" "example" {
+resource "aws_cloudwatch_log_group" "lambda" {
   name              = "/aws/lambda/${var.lambda_name}"
   retention_in_days = 7
 }
@@ -225,4 +225,8 @@ resource "aws_cloudwatch_metric_alarm" "fetcher_lambda_errors" {
 
 output "database_arn" {
   value = aws_dynamodb_table.ptos_fetcher.arn
+}
+
+output "lambda_alarm_sns_topic_arn" {
+  value = aws_sns_topic.alarm.arn
 }

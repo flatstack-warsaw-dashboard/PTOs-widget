@@ -61,9 +61,14 @@ resource "aws_lambda_function" "lambda" {
       TABLE_NAME = var.table_name
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs,
+    aws_cloudwatch_log_group.lambda,
+  ]
 }
 
-resource "aws_cloudwatch_log_group" "example" {
+resource "aws_cloudwatch_log_group" "lambda" {
   name              = "/aws/lambda/${var.lambda_name}"
   retention_in_days = 7
 }
@@ -91,12 +96,30 @@ resource "aws_iam_policy" "lambda_logging" {
   POLICY
 }
 
+resource "aws_cloudwatch_metric_alarm" "api_lambda_errors" {
+  alarm_name          = "api_lambda_errors_alarm"
+  alarm_description   = "Lambda function failed more than 1 time in the last 30 minutes."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  period              = 1800
+  datapoints_to_alarm = 1
+  statistic           = "Sum"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  dimensions = {
+    "FunctionName" = aws_lambda_function.lambda.function_name
+  }
+  threshold          = 1
+  treat_missing_data = "missing"
+  alarm_actions      = [data.terraform_remote_state.ptos_fetcher.outputs.lambda_alarm_sns_topic_arn]
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
-data "terraform_remote_state" "database" {
+data "terraform_remote_state" "ptos_fetcher" {
   backend = "s3"
 
   config = {
@@ -112,7 +135,7 @@ data "aws_iam_policy_document" "dynamo" {
       "dynamodb:Scan"
     ]
     resources = [
-      data.terraform_remote_state.database.outputs.database_arn
+      data.terraform_remote_state.ptos_fetcher.outputs.database_arn
     ]
   }
 }
