@@ -1,4 +1,4 @@
-variable "global_name" { default = "ptos_widget_api" }
+variable "lambda_name" { default = "ptos_widget_api" }
 variable "table_name" { default = "ptos_fetcher" }
 variable "bucket" { default = "tfstat3s" }
 variable "region" { default = "eu-central-1" }
@@ -19,7 +19,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-central-1"
+  region = "eu-central-1"
 }
 
 data "archive_file" "lambda_zip" {
@@ -29,7 +29,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_iam_role" "lambda" {
-  name = var.global_name
+  name = var.lambda_name
 
   assume_role_policy = <<-POLICY
   {
@@ -50,7 +50,7 @@ resource "aws_iam_role" "lambda" {
 
 resource "aws_lambda_function" "lambda" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = var.global_name
+  function_name    = var.lambda_name
   role             = aws_iam_role.lambda.arn
   handler          = "app.lambdaHandler"
   runtime          = "nodejs14.x"
@@ -61,6 +61,39 @@ resource "aws_lambda_function" "lambda" {
       TABLE_NAME = var.table_name
     }
   }
+}
+
+resource "aws_cloudwatch_log_group" "example" {
+  name              = "/aws/lambda/${var.lambda_name}"
+  retention_in_days = 7
+}
+
+resource "aws_iam_policy" "lambda_logging" {
+  name        = "${var.lambda_name}_lambda_logging"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+
+  policy = <<-POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:*:*",
+        "Effect": "Allow"
+      }
+    ]
+  }
+  POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
 data "terraform_remote_state" "database" {
@@ -91,7 +124,7 @@ resource "aws_iam_role_policy" "lambda_dynamo" {
 }
 
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = var.global_name
+  name          = var.lambda_name
   protocol_type = "HTTP"
 }
 

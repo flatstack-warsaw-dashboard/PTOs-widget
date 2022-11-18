@@ -17,7 +17,7 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-variable "global_name" { default = "ptos_fetcher" }
+variable "lambda_name" { default = "ptos_fetcher" }
 variable "table_name" { default = "ptos_fetcher" }
 
 data "archive_file" "lambda_zip" {
@@ -27,7 +27,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_iam_role" "lambda" {
-  name = var.global_name
+  name = var.lambda_name
 
   assume_role_policy = <<-POLICY
   {
@@ -52,7 +52,7 @@ data "aws_ssm_parameter" "ami" {
 
 resource "aws_lambda_function" "lambda" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = var.global_name
+  function_name    = var.lambda_name
   role             = aws_iam_role.lambda.arn
   handler          = "app.lambdaHandler"
   runtime          = "nodejs14.x"
@@ -64,6 +64,11 @@ resource "aws_lambda_function" "lambda" {
       TABLE_NAME   = var.table_name
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs,
+    aws_cloudwatch_log_group.example,
+  ]
 }
 
 resource "aws_dynamodb_table" "ptos_fetcher" {
@@ -76,42 +81,6 @@ resource "aws_dynamodb_table" "ptos_fetcher" {
     name = "uid"
     type = "S"
   }
-}
-
-resource "aws_dynamodb_table_item" "ptos_fetcher_metadata_item" {
-  table_name = aws_dynamodb_table.ptos_fetcher.name
-  hash_key   = aws_dynamodb_table.ptos_fetcher.hash_key
-
-  item = <<-ITEM
-  {
-    "uid": {
-      "S": "meta"
-    },
-    "dates": {
-      "L": [
-        {
-          "M": {
-            "endDate": {
-              "S": "0000-00-00"
-            },
-            "startDate": {
-              "S": "0000-00-00"
-            }
-          }
-        }
-      ]
-    },
-    "full_name": {
-      "S": "0"
-    },
-    "profile_photo": {
-      "S": "0"
-    },
-    "last_updated_at": {
-      "S": "0"
-    }
-  }
-  ITEM
 }
 
 data "aws_iam_policy_document" "dynamo" {
@@ -149,6 +118,39 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
   function_name = aws_lambda_function.lambda.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.every_hour_on_weekdays.arn
+}
+
+resource "aws_cloudwatch_log_group" "example" {
+  name              = "/aws/lambda/${var.lambda_name}"
+  retention_in_days = 7
+}
+
+resource "aws_iam_policy" "lambda_logging" {
+  name        = "${var.lambda_name}_lambda_logging"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+
+  policy = <<-POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:*:*",
+        "Effect": "Allow"
+      }
+    ]
+  }
+  POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
 module "chatbot_slack_configuration" {

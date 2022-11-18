@@ -29,7 +29,7 @@ export const lambdaHandler = async () => {
     widgetData[date] ??= {};
 
     items.Items.forEach((item) => {
-      if (item.last_updated_at >= metaItem.last_updated_at) {
+      if (item.last_updated_at >= (metaItem?.last_updated_at || 0)) {
         item.dates?.forEach((ptoDates) => {
           if (
             ptoDates.startDate === date || ptoDates.endDate === date ||
