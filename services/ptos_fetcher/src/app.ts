@@ -48,7 +48,8 @@ export const lambdaHandler = async () => {
     };
   });
 
-  dynamoDbHelper.putRequest(data);
+  const dbUpdateRequest = await dynamoDbHelper.putRequest(data);
+  console.log(JSON.stringify(dbUpdateRequest));
 };
 
 lambdaHandler();

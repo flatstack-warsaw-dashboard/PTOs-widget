@@ -56,6 +56,7 @@ resource "aws_lambda_function" "lambda" {
   role             = aws_iam_role.lambda.arn
   handler          = "app.lambdaHandler"
   runtime          = "nodejs14.x"
+  timeout          = 6
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip.output_path)
 
   environment {

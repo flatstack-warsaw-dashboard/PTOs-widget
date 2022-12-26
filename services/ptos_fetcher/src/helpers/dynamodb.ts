@@ -26,7 +26,7 @@ export async function putRequest(data: dynamoDbData) {
   });
 
   const documentClient = new AWS.DynamoDB.DocumentClient();
-  await documentClient
+  return await documentClient
     .batchWrite({
       RequestItems: {
         [process.env.TABLE_NAME]: batchPutRequest,

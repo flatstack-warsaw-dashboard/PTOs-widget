@@ -54,8 +54,9 @@ const DateBlock = styled.div`
 
   .date__title {
     display: table-cell;
-    height: 3em;
+    height: 2.5em;
     font-size: 1.1em;
+    vertical-align: middle;
   }
 
   .date__empty-day {
@@ -69,8 +70,8 @@ const DateBlock = styled.div`
   }
 
   .date__people-imgs img {
-    width: 2em;
-    height: 2em;
+    width: 1.5em;
+    height: 1.5em;
     margin-right: -10px;
     object-fit: cover;
     border: 0.1em solid white;
