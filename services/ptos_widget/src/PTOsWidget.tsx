@@ -19,6 +19,7 @@ const DateBlock = styled.div`
   padding: 0.1em;
   color: #333;
   transition: all 0.25s ease;
+  overflow: scroll;
 
   .date__icon {
     float: left;
