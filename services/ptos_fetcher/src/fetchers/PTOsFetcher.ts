@@ -18,6 +18,8 @@ export default class PTOsFetcher {
     const ptosContent = await this.queryCollection();
     const { blockIds } =
       ptosContent.data.result.reducerResults.calendar_results;
+    console.log(`Fetched ${blockIds.length} blocks`);
+
     const ptos: PTO[] = [];
     blockIds.forEach((blockId: string) => {
       const blockProps =
@@ -97,6 +99,7 @@ export default class PTOsFetcher {
       data: JSON.stringify(calendarQueryBody),
       headers: {
         'Content-Type': 'application/json',
+        'x-notion-active-user-header': '8adf5dff-f666-4b54-a1f7-c73bc33bbf3e',
         Cookie: `token_v2=${this.token};`,
       },
     });
